@@ -1,11 +1,9 @@
-package example.com
+package com.github.devinkadrie.basedbin
 
-import example.com.plugins.*
+import com.github.devinkadrie.basedbin.plugins.*
 import io.ktor.server.application.*
 
-fun main(args: Array<String>) {
-    io.ktor.server.netty.EngineMain.main(args)
-}
+fun main(args: Array<String>) = io.ktor.server.netty.EngineMain.main(args)
 
 fun Application.module() {
     configureHTTP()

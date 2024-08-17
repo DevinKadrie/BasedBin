@@ -1,4 +1,4 @@
-package example.com.plugins
+package com.github.devinkadrie.basedbin.plugins
 
 import io.ktor.http.*
 import io.ktor.server.application.*

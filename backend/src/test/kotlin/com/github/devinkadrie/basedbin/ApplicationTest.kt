@@ -1,6 +1,6 @@
-package example.com
+package com.github.devinkadrie.basedbin
 
-import example.com.plugins.*
+import com.github.devinkadrie.basedbin.plugins.*
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
