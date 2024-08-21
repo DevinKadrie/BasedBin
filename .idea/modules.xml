@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/basedbin.iml" filepath="$PROJECT_DIR$/.idea/basedbin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/com.github.devinkadrie.basedbin.iml" filepath="$PROJECT_DIR$/.idea/modules/com.github.devinkadrie.basedbin.iml" />
     </modules>
   </component>
 </project>
