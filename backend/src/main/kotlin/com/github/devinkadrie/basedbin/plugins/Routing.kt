@@ -1,32 +1,33 @@
 package com.github.devinkadrie.basedbin.plugins
 
+import com.github.devinkadrie.basedbin.Paste
+import com.github.devinkadrie.basedbin.PasteService
+import com.github.devinkadrie.basedbin.connectToPostgres
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.resources.Resources
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import java.io.File
-import java.util.UUID
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class Paste(val content: String)
+import java.sql.Connection
 
 fun Application.configureRouting() {
     install(Resources)
+    val dbConnection: Connection = connectToPostgres(embedded = false)
+    val pasteService = PasteService(dbConnection)
+
     routing {
         get("/") {
             call.respondText("Hi Shane")
         }
+
         get("/{id}") {
-            val contents = File(call.parameters["id"]!!).readText()
-            call.respondText(contents)
+            val id = call.parameters["id"]?.toIntOrNull()!!
+            call.respondText(pasteService.read(id).content)
         }
+
         post("/") {
             val paste = call.receive<Paste>()
-            val id = UUID.randomUUID().toString()
-            File(id).writeText(paste.content)
-            call.respondText(id)
+            call.respondText(pasteService.create(paste).toString())
         }
     }
 }
