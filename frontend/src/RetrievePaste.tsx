@@ -7,7 +7,7 @@ const RetrievePaste = () => {
   const onSubmitGet = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const response = await fetch(`http://localhost:8080/${id}`);
+    const response = await fetch(`http://localhost:8080/pastes/${id}`);
     const paste = await response.text();
     setRetrievedPaste(paste);
   };

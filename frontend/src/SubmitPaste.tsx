@@ -7,7 +7,7 @@ const SubmitPaste = () => {
   const onSubmitPaste = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    const response = await fetch("http://localhost:8080/", {
+    const response = await fetch("http://localhost:8080/pastes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ content: paste }),
