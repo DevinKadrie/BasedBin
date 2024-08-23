@@ -9,7 +9,9 @@ import io.ktor.server.resources.get
 import io.ktor.server.resources.Resources
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import kotlinx.serialization.Serializable
 import java.sql.Connection
+import java.util.*
 
 fun Application.configureRouting() {
     install(Resources)
@@ -36,7 +38,10 @@ fun Application.configureRouting() {
 @Resource("/pastes")
 class Pastes {
     @Resource("{id}")
-    class Id(val parent: Pastes = Pastes(), val id: Int)
+    class Id(
+        val parent: Pastes = Pastes(),
+        val id: @Serializable(with = UUIDSerializer::class) UUID
+    )
 }
 
 
