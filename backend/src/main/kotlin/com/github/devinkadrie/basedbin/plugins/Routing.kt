@@ -1,8 +1,6 @@
 package com.github.devinkadrie.basedbin.plugins
 
-import com.github.devinkadrie.basedbin.Paste
-import com.github.devinkadrie.basedbin.PasteService
-import com.github.devinkadrie.basedbin.connectToPostgres
+import com.github.devinkadrie.basedbin.*
 import io.ktor.resources.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -25,7 +23,12 @@ fun Application.configureRouting() {
 
         post<Pastes> {
             val paste = call.receive<Paste>()
-            call.respondText(pasteService.create(paste).toString())
+
+            val newId = pasteService.create(paste)
+
+            val pasteUrl = "${call.request.local.reconstruct()}/$newId"
+
+            call.respondText(pasteUrl)
         }
     }
 }
