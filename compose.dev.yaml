@@ -1,0 +1,128 @@
+# This a Docker Compose file for local development.
+#
+# It defines a set of services that can be brought up
+# as a group or "swarm", which are networked together.
+# This allows the developer to set up local development
+# without needing a complex set of dependencies. It also
+# enables starting services in a defined manner.
+
+
+# Define our services for development.
+services:
+
+  # A hot-reload enabled service for the frontend.
+  frontend:
+
+    # As seen in logs.
+    container_name: basedbin-frontend
+
+    # Build the development image from the `frontend` subdirectory.
+    build:
+      context: frontend
+      dockerfile: docker/Dev.Dockerfile
+
+    # In the built container, run this command.
+    command: bun run dev --host
+
+    # Expose the default Vite port as the same number on the host.
+    ports:
+      - "5173:5173"
+
+    # Configure file watching.
+    develop:
+      watch:
+        # If any source file changes, just re-sync, since
+        # Vite can hot-reload.
+        - action: sync
+          path: frontend
+          target: /app/
+          ignore:
+            - dist/
+            - node_modules/
+
+        # If the package.json file changes, then we need
+        # to rebuild the container so that bun install
+        # runs again.
+        - action: rebuild
+          path: frontend/package.json
+          target: /app/package.json
+
+        # If the Vite config changes, we need to relaunch
+        # the container, so that Vite restarts.
+        - action: sync+restart
+          path: frontend/vite.config.ts
+          target: /app/vite.config.ts
+
+    # Our frontend is up when an HTTP get request succeeds.
+    healthcheck:
+      test: [ "CMD-SHELL", "curl localhost:5173" ]
+      interval: 1s
+
+    # Don't start the frontend until the backend is up.
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  # A hot-reload enabled service for the backend.
+  backend:
+
+    # As seen in logs.
+    container_name: basedbin-backend
+
+    # Build the development image from the `backend` subdirectory.
+    build:
+      context: backend
+      dockerfile: docker/Dev.Dockerfile
+
+    # We can't get away with spawning the gradle build server
+    # and the app itself, so we delegate to a script that launches both.
+    command: ./run.sh
+
+    # The backend needs to be exposed as well as the frontend,
+    # since it's the _browser on the host_ that makes the request.
+    ports:
+      - "8080:8080"
+
+    # Configure file watching.
+    develop:
+      # If any source file changes, just re-sync, since
+      # gradle is running a build server, and Netty can
+      # do hot class file replacement.
+      watch:
+        - action: sync
+          path: backend
+          target: /app/
+
+    # Our backend is up when we can hit the healthcheck route.
+    healthcheck:
+      test: [ "CMD-SHELL", "curl localhost:8080/healthcheck" ]
+      retries: 100
+      interval: 1s
+
+    # Wait to start the backend until the db is up.
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # A PostgreSQL database
+  db:
+    # As seen in logs.
+    container_name: basedbin-postgres
+
+    # Use the bog-standard image.
+    image: postgres
+
+    # So that we can peek at the database, not needed for backend to
+    # connect to the database when runner under compose.
+    ports:
+      - "5432:5432"
+
+    # Inject some environment variables.
+    environment:
+      # Disable password, since this is a local network.
+      POSTGRES_HOST_AUTH_METHOD: trust
+
+    # Postgres is up when its CLI says it is.
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 1s

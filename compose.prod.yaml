@@ -1,0 +1,17 @@
+services:
+
+  # A hot-reload enabled service for the frontend.
+  frontend:
+
+    # Build the development image from the `frontend` subdirectory.
+    build:
+      context: frontend
+      dockerfile: docker/Prod.Dockerfile
+
+    # Start an init process so that `docker compose stop` or Ctrl-C
+    # has a root process that forwards signals to children, stopping
+    # our process.
+    init: true
+
+    ports:
+      - "80:80"

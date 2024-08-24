@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -eu pipefail
+
+if [[ "$BASEBIN_DEBUG" eq "1" ]]; then
+  set -x
+fi
+
+SCRIPT_DIR=$(dirname $(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &> /dev/null && pwd))
+cd $SCRIPT_DIR
+
+docker compose -f compose.dev.yaml up --watch

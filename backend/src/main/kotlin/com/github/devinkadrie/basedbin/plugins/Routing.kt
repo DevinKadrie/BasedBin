@@ -1,6 +1,7 @@
 package com.github.devinkadrie.basedbin.plugins
 
 import com.github.devinkadrie.basedbin.*
+import io.ktor.http.*
 import io.ktor.resources.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -19,6 +20,10 @@ fun Application.configureRouting() {
     val pasteService = PasteService(dbConnection)
 
     routing {
+        get("/healthcheck") {
+            call.respond(HttpStatusCode.OK, "OK")
+        }
+
         get<Pastes.Id> { id ->
             call.respondText(pasteService.read(id.id).content)
         }
@@ -30,7 +35,7 @@ fun Application.configureRouting() {
 
             val pasteUrl = "${call.request.local.reconstruct()}/$newId"
 
-            call.respondText(pasteUrl)
+            call.respondText(pasteUrl, status = HttpStatusCode.Created)
         }
     }
 }

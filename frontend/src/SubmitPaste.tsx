@@ -2,7 +2,7 @@ import { FormEvent, useState } from "react";
 
 const SubmitPaste = () => {
   const [paste, setPaste] = useState("");
-  const [returnedId, setReturnedId] = useState("");
+  const [returnedUrl, setReturnedUrl] = useState("");
 
   const onSubmitPaste = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -12,7 +12,7 @@ const SubmitPaste = () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ content: paste }),
     });
-    setReturnedId(await response.text());
+    setReturnedUrl(await response.text());
   };
   return (
     <>
@@ -20,7 +20,7 @@ const SubmitPaste = () => {
         <input name="paste" onChange={(e) => setPaste(e.target.value)} />
         <button>Upload</button>
       </form>
-      <div>{returnedId}</div>
+      <div>{returnedUrl}</div>
     </>
   );
 };
