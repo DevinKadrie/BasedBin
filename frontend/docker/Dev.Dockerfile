@@ -7,7 +7,7 @@ FROM oven/bun:1-slim
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get -qq -y install curl
 
 # Move the source code and ourselves into the /app directory
-COPY .. /app
+COPY . /app
 WORKDIR /app
 
 # Install dependencies.
