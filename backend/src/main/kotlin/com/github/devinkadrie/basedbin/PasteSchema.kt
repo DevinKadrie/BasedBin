@@ -15,6 +15,7 @@ class PasteService(private val connection: Connection) {
         private const val CREATE_TABLE_PASTES = "CREATE TABLE IF NOT EXISTS pastes (id UUID PRIMARY KEY, content VARCHAR(255));"
         private const val SELECT_PASTE_BY_ID = "SELECT content FROM pastes WHERE id = ?"
         private const val INSERT_PASTE = "INSERT INTO pastes (id, content) VALUES (?, ?)"
+        private const val DELETE_PASTE_BY_ID = "DELETE FROM pastes WHERE id = ?"
     }
 
     init {
@@ -43,7 +44,16 @@ class PasteService(private val connection: Connection) {
             val content = resultSet.getString("content")
             return@withContext Paste(content)
         } else {
-            throw Exception("Record not found")
+            throw Exception("Paste not found")
+        }
+    }
+
+    suspend fun delete(id: UUID) {
+        val statement = connection.prepareStatement(DELETE_PASTE_BY_ID)
+        statement.setObject(1, id)
+        val result = statement.executeUpdate()
+        if (result == 0) {
+            throw Exception("Paste not found")
         }
     }
 }

@@ -7,7 +7,7 @@ ktor:
 
 postgres:
     url:
-        "jdbc:postgresql://localhost:32771/postgres"
+        "jdbc:postgresql://localhost:5432/postgres"
     user:
         "postgres"
     password:

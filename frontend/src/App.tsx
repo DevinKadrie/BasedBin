@@ -1,3 +1,4 @@
+import DeletePaste from "./DeletePaste";
 import RetrievePaste from "./RetrievePaste";
 import SubmitPaste from "./SubmitPaste";
 
@@ -6,6 +7,7 @@ const App = () => {
     <>
       <SubmitPaste />
       <RetrievePaste />
+      <DeletePaste />
     </>
   );
 };
