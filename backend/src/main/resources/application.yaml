@@ -1,14 +1,9 @@
 ktor:
+    development: true
     application:
         modules:
             - com.github.devinkadrie.basedbin.ApplicationKt.module
     deployment:
         port: 8080
-
-postgres:
-    url:
-        "jdbc:postgresql://localhost:32771/postgres"
-    user:
-        "postgres"
-    password:
-        ""
+        watch:
+            - classes

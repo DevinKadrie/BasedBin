@@ -27,6 +27,7 @@ dependencies {
     implementation("io.ktor:ktor-server-netty-jvm:2.3.12")
     implementation("io.ktor:ktor-server-config-yaml:2.3.12")
     implementation("com.fasterxml.uuid:java-uuid-generator:5.1.0")
+    implementation("aws.sdk.kotlin:s3:1.3.23")
 
     implementation("org.postgresql:postgresql:42.7.2")
     implementation("com.h2database:h2:2.1.214")

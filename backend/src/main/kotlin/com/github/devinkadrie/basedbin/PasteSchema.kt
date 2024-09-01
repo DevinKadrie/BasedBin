@@ -1,50 +1,48 @@
 package com.github.devinkadrie.basedbin
 
-import com.fasterxml.uuid.Generators
+import aws.sdk.kotlin.services.s3.S3Client
+import aws.sdk.kotlin.services.s3.model.ChecksumAlgorithm
+import aws.sdk.kotlin.services.s3.model.GetObjectRequest
+import aws.sdk.kotlin.services.s3.model.PutObjectRequest
+import aws.smithy.kotlin.runtime.content.ByteStream
+import aws.smithy.kotlin.runtime.content.asByteStream
+import aws.smithy.kotlin.runtime.content.writeToOutputStream
+import aws.smithy.kotlin.runtime.http.toHttpBody
 import kotlinx.coroutines.*
 import kotlinx.serialization.Serializable
-import java.sql.Connection
-import java.sql.Statement
+import java.io.InputStream
+import java.io.OutputStream
 import java.util.UUID
 
 @Serializable
 data class Paste(val content: String)
 
-class PasteService(private val connection: Connection) {
-    companion object {
-        private const val CREATE_TABLE_PASTES = "CREATE TABLE IF NOT EXISTS pastes (id UUID PRIMARY KEY, content VARCHAR(255));"
-        private const val SELECT_PASTE_BY_ID = "SELECT content FROM pastes WHERE id = ?"
-        private const val INSERT_PASTE = "INSERT INTO pastes (id, content) VALUES (?, ?)"
-    }
-
+class PasteService(private val client: S3Client) {
     init {
-        val statement = connection.createStatement()
-        statement.executeUpdate(CREATE_TABLE_PASTES)
+        // TODO: Create bucket if it does not exist.
     }
 
     suspend fun create(paste: Paste): UUID = withContext(Dispatchers.IO) {
-        val statement = connection.prepareStatement(INSERT_PASTE, Statement.RETURN_GENERATED_KEYS)
+        val s3Key = UUID.randomUUID()
+        val request = PutObjectRequest {
+            bucket = "pastes"
+            key = s3Key.toString()
+            this.body = ByteStream.fromString(paste.content)
+        }
 
-        val uuid = Generators.timeBasedEpochGenerator().generate()
+        val response = client.putObject(request)
+        // TODO: Handle response
 
-        statement.setObject(1, uuid)
-        statement.setString(2, paste.content)
-        statement.executeUpdate()
-
-        return@withContext uuid
+        return@withContext s3Key
     }
 
-    suspend fun read(id: UUID): Paste = withContext(Dispatchers.IO) {
-        val statement = connection.prepareStatement(SELECT_PASTE_BY_ID)
-        statement.setObject(1, id)
-        val resultSet = statement.executeQuery()
-
-        if (resultSet.next()) {
-            val content = resultSet.getString("content")
-            return@withContext Paste(content)
-        } else {
-            throw Exception("Record not found")
+    suspend fun read(id: UUID, output: OutputStream) = withContext(Dispatchers.IO) {
+        val request = GetObjectRequest {
+            bucket = "pastes"
+            key = id.toString()
         }
+        // TODO: Null
+        client.getObject(request) { it.body?.writeToOutputStream(output) }
     }
 }
 
