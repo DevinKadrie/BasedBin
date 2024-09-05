@@ -11,6 +11,7 @@ import io.ktor.server.resources.get
 import io.ktor.server.resources.Resources
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.Serializable
 import java.util.*
 
@@ -27,15 +28,26 @@ fun Application.configureRouting() {
     routing {
         get<Pastes.Id> { id ->
             call.respondOutputStream {
-                pasteService.read(id.id, this)
+                try{
+                    pasteService.read(id.id, this)
+                }
+                
+                catch (e : StorageException){
+                    call.respond(HttpStatusCode.NotFound, e.message ?: "Storage error")
+                }
             }
         }
 
         post<Pastes> {
             val paste = call.receive<Paste>()
             val newId = pasteService.create(paste)
-            val pasteUrl = "${call.request.local.reconstruct()}/$newId"
-            call.respondText(pasteUrl)
+            if (newId == null) {
+                call.respond(HttpStatusCode.InternalServerError, "Storage backend failure")
+            }
+            else {
+                val pasteUrl = "${call.request.local.reconstruct()}/$newId"
+                call.respondText(pasteUrl)
+            }
         }
     }
 }
