@@ -14,6 +14,9 @@ import io.ktor.server.routing.*
 import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.Serializable
 import java.util.*
+import  java.sql.Connection
+import UserService
+import User
 
 fun Application.configureRouting() {
     install(Resources)
@@ -24,6 +27,9 @@ fun Application.configureRouting() {
 
     }
     val pasteService = PasteService(client)
+    
+    val dbConnection: Connection = connectToPostgres(embedded = false)
+    val UserService = UserService(dbConnection)
 
     routing {
         get<Pastes.Id> { id ->
@@ -47,6 +53,28 @@ fun Application.configureRouting() {
             else {
                 val pasteUrl = "${call.request.local.reconstruct()}/$newId"
                 call.respondText(pasteUrl)
+            }
+        }
+
+        post("/register"){
+            val user = call.receive<User>()
+            try{
+                UserService.create(user)
+                call.respond(HttpStatusCode.Created)
+            }
+            catch (e: Exception){
+                call.respond(HttpStatusCode.InternalServerError)
+            } 
+        }
+
+        post("/login"){
+            val user= call.receive<User>()
+            try{
+                UserService.read(user)
+                call.respond(HttpStatusCode.OK)
+            }
+            catch (e: Exception){
+                call.respond(HttpStatusCode.NotFound)
             }
         }
     }

@@ -7,3 +7,10 @@ ktor:
         port: 8080
         watch:
             - classes
+postgres:
+    url:
+        "jdbc:postgresql://localhost:5432/postgres"
+    user:
+        "postgres"
+    password:
+        ""

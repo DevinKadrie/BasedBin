@@ -1,0 +1,23 @@
+services: 
+  # A PostgreSQL database
+  db:
+    # As seen in logs.
+    container_name: basedbin-postgres
+
+    # Use the bog-standard image.
+    image: postgres
+
+    # So that we can peek at the database, not needed for backend to
+    # connect to the database when runner under compose.
+    ports:
+      - "5432:5432"
+
+    # Inject some environment variables.
+    environment:
+      # Disable password, since this is a local network.
+      POSTGRES_HOST_AUTH_METHOD: trust
+
+    # Postgres is up when its CLI says it is.
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 1s
