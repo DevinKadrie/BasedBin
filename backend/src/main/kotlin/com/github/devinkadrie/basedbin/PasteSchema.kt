@@ -5,6 +5,10 @@ import aws.sdk.kotlin.services.s3.model.CreateBucketRequest
 import aws.sdk.kotlin.services.s3.model.GetObjectRequest
 import aws.sdk.kotlin.services.s3.model.PutObjectRequest
 import aws.sdk.kotlin.services.s3.model.BucketAlreadyExists
+import aws.sdk.kotlin.services.s3.model.ListBucketsRequest
+import aws.sdk.kotlin.services.s3.model.HeadBucketRequest
+import aws.sdk.kotlin.services.s3.model.ListBucketsResponse
+import aws.sdk.kotlin.services.s3.listBuckets
 import aws.smithy.kotlin.runtime.content.ByteStream
 import aws.smithy.kotlin.runtime.content.writeToOutputStream
 import java.io.OutputStream
@@ -19,19 +23,16 @@ class StorageException(message: String = "Storage Error") : Exception(message)
 class PasteService(private val client: S3Client) {
     private var initialized = false
 
-    //TODO find proper way to handle if bucket already exists
     private suspend fun maybeInit() {
         if (initialized) return
-        val request = CreateBucketRequest { bucket = "boofer" }
-
-        try{
+        val request = CreateBucketRequest { bucket = "Pastes" }
+        val listBucketsResponse = client.listBuckets()
+        val bucket = listBucketsResponse.buckets?.find{it.name == "Pastes"}
+        if(bucket == null){
             client.createBucket(request)
             initialized = true
         }
-        catch (f: Exception){
-            //NOTE: assuming this is BucketAlreadyExists
-        }
-       
+        return
     }
 
     suspend fun create(paste: Paste): UUID? =
