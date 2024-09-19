@@ -7,6 +7,13 @@ plugins {
 group = "com.github.devinkadrie.basedbin"
 version = "0.1.0"
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+        vendor = JvmVendorSpec.AMAZON
+    }
+}
+
 application {
     mainClass.set("io.ktor.server.netty.EngineMain")
 
