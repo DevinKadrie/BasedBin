@@ -14,12 +14,11 @@ import io.ktor.server.routing.*
 import io.ktor.http.HttpStatusCode
 import kotlinx.serialization.Serializable
 import java.util.*
-import  java.sql.Connection
-import UserService
-import User
+import java.sql.Connection
 
 fun Application.configureRouting() {
     install(Resources)
+
     val client = S3Client {
         endpointUrl = Url.parse("http://localhost:4566")
         region = "us-east-1"
@@ -28,8 +27,8 @@ fun Application.configureRouting() {
     }
     val pasteService = PasteService(client)
     
-    val dbConnection: Connection = connectToPostgres(embedded = false)
-    val UserService = UserService(dbConnection)
+    val dbConnection: Connection = connectToPostgres(embedded = true)
+    val userService = UserService(dbConnection)
 
     routing {
         get<Pastes.Id> { id ->
@@ -59,7 +58,7 @@ fun Application.configureRouting() {
         post("/register"){
             val user = call.receive<User>()
             try{
-                UserService.create(user)
+                userService.create(user)
                 call.respond(HttpStatusCode.Created)
             }
             catch (e: Exception){
@@ -70,7 +69,7 @@ fun Application.configureRouting() {
         post("/login"){
             val user= call.receive<User>()
             try{
-                UserService.read(user)
+                userService.read(user)
                 call.respond(HttpStatusCode.OK)
             }
             catch (e: Exception){
