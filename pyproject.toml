@@ -1,0 +1,10 @@
+[project]
+name = "basedbin"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "awscli-local[ver1]>=0.22.0",
+    "localstack>=3.7.1",
+]
