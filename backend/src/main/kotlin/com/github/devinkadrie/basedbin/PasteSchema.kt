@@ -11,8 +11,7 @@ import java.util.UUID
 import kotlinx.coroutines.*
 import kotlinx.serialization.Serializable
 
-@Serializable
-data class Paste(val content: String)
+@Serializable data class Paste(val content: String)
 
 class StorageException(message: String = "Storage Error") : Exception(message)
 
