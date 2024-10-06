@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.ktor)
+    alias(libs.plugins.ktfmt)
 }
 
 group = "com.github.devinkadrie.basedbin"
@@ -12,6 +13,10 @@ java {
         languageVersion = JavaLanguageVersion.of(17)
         vendor = JvmVendorSpec.AMAZON
     }
+}
+
+ktfmt {
+    kotlinLangStyle()
 }
 
 application {
