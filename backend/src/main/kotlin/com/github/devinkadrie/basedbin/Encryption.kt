@@ -1,4 +1,4 @@
-package com.github.devinkadrie.basedbin.plugins
+package com.github.devinkadrie.basedbin
 
 import java.security.SecureRandom
 import java.security.spec.KeySpec

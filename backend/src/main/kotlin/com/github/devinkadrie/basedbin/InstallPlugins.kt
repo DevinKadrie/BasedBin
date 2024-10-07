@@ -1,10 +1,14 @@
-package com.github.devinkadrie.basedbin.plugins
+package com.github.devinkadrie.basedbin
 
 import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
+import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
+import io.ktor.server.resources.*
 
-fun Application.configureHTTP() {
+fun Application.installPlugins() {
+    install(Resources)
     install(CORS) {
         allowNonSimpleContentTypes = true
 
@@ -21,4 +25,6 @@ fun Application.configureHTTP() {
         // FIXME: Point at deployed host.
         anyHost()
     }
+
+    install(ContentNegotiation) { json() }
 }

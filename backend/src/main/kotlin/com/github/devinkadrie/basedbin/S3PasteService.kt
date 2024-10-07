@@ -5,17 +5,11 @@ import aws.sdk.kotlin.services.s3.model.CreateBucketRequest
 import aws.sdk.kotlin.services.s3.model.GetObjectRequest
 import aws.sdk.kotlin.services.s3.model.PutObjectRequest
 import aws.smithy.kotlin.runtime.content.ByteStream
-import aws.smithy.kotlin.runtime.content.writeToOutputStream
-import java.io.OutputStream
+import aws.smithy.kotlin.runtime.content.decodeToString
 import java.util.UUID
 import kotlinx.coroutines.*
-import kotlinx.serialization.Serializable
 
-@Serializable data class Paste(val content: String)
-
-class StorageException(message: String = "Storage Error") : Exception(message)
-
-class PasteService(private val client: S3Client) {
+class S3PasteService(private val client: S3Client) : PasteService {
     private var initialized = false
 
     private suspend fun maybeInit() {
@@ -30,7 +24,7 @@ class PasteService(private val client: S3Client) {
         return
     }
 
-    suspend fun create(paste: Paste): UUID? =
+    override suspend fun create(paste: Paste): UUID? =
         withContext(Dispatchers.IO) {
             maybeInit()
             val s3Key = UUID.randomUUID()
@@ -47,7 +41,7 @@ class PasteService(private val client: S3Client) {
             }
         }
 
-    suspend fun read(id: UUID, output: OutputStream) =
+    override suspend fun read(id: UUID) =
         withContext(Dispatchers.IO) {
             maybeInit()
             val request = GetObjectRequest {
@@ -55,9 +49,6 @@ class PasteService(private val client: S3Client) {
                 key = id.toString()
             }
 
-            client.getObject(request) {
-                if (it.body == null) throw StorageException()
-                it.body?.writeToOutputStream(output)
-            }
+            client.getObject(request) { it.body?.decodeToString()?.let(::Paste) }
         }
 }
