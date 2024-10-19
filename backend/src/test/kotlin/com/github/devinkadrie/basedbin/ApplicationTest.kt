@@ -37,4 +37,34 @@ class ApplicationTest {
             assertEquals(paste.content, it.body<Paste>().content)
         }
     }
+    @Test
+    fun testUserRoutes() = testApplication {
+        val userService = MockUserService()
+        application { installPlugins() }
+        routing {userRoutes(userService)}
+
+        val client = createClient { install(ContentNegotiation) {json()} }
+        val user = User(username = "testuser", password = "testpass")
+        client.post("/register") {
+            contentType(ContentType.Application.Json)
+            setBody(user)
+        }.let{
+                assertEquals(HttpStatusCode.Created, it.status)
+            }
+
+        client.post("/login") {
+            contentType(ContentType.Application.Json)
+            setBody(user)
+        }.let{
+            assertEquals(HttpStatusCode.OK, it.status)
+        }
+
+        val badUser = User(username = "baduser", password = "badpass")
+        client.post("/login"){
+            contentType(ContentType.Application.Json)
+            setBody(badUser)
+        }.let{
+            assertEquals(HttpStatusCode.NotFound, it.status)
+        }
+    }
 }

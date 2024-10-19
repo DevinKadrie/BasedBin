@@ -4,7 +4,6 @@ import java.sql.Connection
 import kotlinx.coroutines.*
 import kotlinx.serialization.Serializable
 
-@Serializable data class User(val username: String, val password: String)
 
 class UserNotFoundException(message: String = "User not found") : Exception(message)
 
