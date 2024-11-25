@@ -2,8 +2,6 @@ package com.github.devinkadrie.basedbin
 
 import java.sql.Connection
 import kotlinx.coroutines.*
-import kotlinx.serialization.Serializable
-
 
 class UserNotFoundException(message: String = "User not found") : Exception(message)
 

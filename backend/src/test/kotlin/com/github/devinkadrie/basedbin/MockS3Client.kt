@@ -16,7 +16,7 @@ class MockS3Client : S3Client {
         TODO("Not yet implemented")
     }
 
-    override fun close()  = Unit
+    override fun close() = Unit
 
     override suspend fun completeMultipartUpload(
         input: CompleteMultipartUploadRequest
