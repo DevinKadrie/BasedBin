@@ -21,7 +21,7 @@ class DefaultUserService(private val connection: Connection) : UserService {
         statement.executeUpdate(CREATE_TABLE_USERS)
     }
 
-    override suspend fun create(user: User) =
+    override suspend fun register(user: User) {
         withContext(Dispatchers.IO) {
             val statement = connection.prepareStatement(INSERT_USER)
             val salt = generateRandomSalt()
@@ -29,8 +29,8 @@ class DefaultUserService(private val connection: Connection) : UserService {
             statement.setString(2, generateHash(user.password, salt.toHexString()))
             statement.setString(3, salt.toHexString())
             statement.executeUpdate()
-            Unit
         }
+    }
 
     override suspend fun exists(user: User) =
         withContext(Dispatchers.IO) {

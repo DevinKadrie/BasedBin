@@ -3,7 +3,7 @@ package com.github.devinkadrie.basedbin
 class MockUserService : UserService {
     private val users: MutableSet<User> = mutableSetOf()
 
-    override suspend fun create(user: User) {
+    override suspend fun register(user: User) {
         users.add(user)
     }
 

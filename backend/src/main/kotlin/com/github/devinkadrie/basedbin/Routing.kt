@@ -25,16 +25,18 @@ fun Route.pasteRoutes(pasteService: PasteService) {
     }
 }
 
-fun Route.userRoutes(userService: UserService){
-    post("/register"){
+fun Route.userRoutes(userService: UserService) {
+    post("/register") {
         val user = call.receive<User>()
         try {
-            userService.create(user)
+            userService.register(user)
             call.respond(HttpStatusCode.Created)
         } catch (e: Exception) {
-            call.respond(HttpStatusCode.InternalServerError)
+            val message = e.message ?: "Unknown error"
+            call.respond(HttpStatusCode.InternalServerError, message)
         }
     }
+
     post("/login") {
         val user = call.receive<User>()
         if (userService.exists(user)) {
@@ -44,6 +46,7 @@ fun Route.userRoutes(userService: UserService){
         }
     }
 }
+
 fun Application.configureRouting(pasteService: PasteService, userService: UserService) {
     routing {
         pasteRoutes(pasteService)
